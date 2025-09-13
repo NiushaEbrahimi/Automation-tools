@@ -1,15 +1,16 @@
 import os
 from time import sleep
-# TODO: going to user's download folder
-# TODO: make it possible for any folder actually
+from pathlib import Path
+
 # TODO: getting info that how many folders and where should the folders be
 # TODO: then search what type of files exist
-
 
 class ChoseFolder:
     def __init__(self):
         self.folder_name = "Downloads"
         self.path = None
+        os.system("cls")
+
     def _input(self):
         print()
         process = True
@@ -41,35 +42,54 @@ class ChoseFolder:
             start_path = "C:\\"
         else:
             start_path = "/"
-
+        paths =[]
         for root, dirs, _ in os.walk(start_path):
             if self.folder_name in dirs:
-                self.path =  os.path.join(root, self.folder_name)
+                paths.append(os.path.join(root, self.folder_name))
+        return paths
     
-        if self.path:
-            print(f"Folder found at: {self.path}")
-
-        else:
-            print("Folder not found.")
-            sleep(1)
-
+    def _chose_path(self, paths):
+        for index , value in enumerate(paths):
+            print(f"{index+1}. {value}")
+        num = int(input("which one of these you want to chose?  "))
+        self.path = paths[num-1]
+    
     def main(self):
-        try:
-            self._input()
-            self._search_for_folder()
-
-        except Exception as e:
-            print(f"the error is: {e}")
-        else : 
-            list = os.listdir(self.path)
-            list_1 = self.path.split("\\")
-            print("\n" , list_1[-1],":")
-            for f in list:
-                print(f"\t-{f}")
-        finally:
-            return self.path
-        
+        while True:
+            try:
+                self._input()
+                all_paths = self._search_for_folder()
+                if all_paths:
+                    os.system("cls")
+                    self._chose_path(all_paths)                
+                else:
+                    print("no folders were found")
+                    continue
+                
+            except Exception as e:
+                print(f"the error is: {e}")
+            else : 
+                try:
+                    items = os.listdir(self.path)
+                    # also => name = os.path.basename(self.path)
+                    print(f"\n{self.path.split("\\")[-1]} contains:")
+                    counter = 0
+                    for item in items:
+                        print(f"\t -{item}")
+                        # Don't need to show the whole folder to the user so that they figure
+                        if counter ==5:
+                            break
+                        counter+=1
+                except PermissionError:
+                    print(f"Cannot read contents of '{self.path.split("\\")[-1]}'")
+            finally:
+                user_action = input("\nDo you want to try again ? (Y/n)")
+                if user_action.lower == "y" or user_action.lower == "yes" or user_action.lower == "":
+                    continue
+                else:
+                    return self.path
+                
 if __name__ == '__main__':
-    chooser = ChoseFolder()
-    result = chooser.main()
-    print("Selected folder:", result)
+    cl = ChoseFolder()
+    result = cl.main()
+    print(f"the chosen path is: {result}")

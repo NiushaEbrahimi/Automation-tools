@@ -2,6 +2,9 @@ from os import system
 import string 
 from random import choice
 from time import sleep
+
+# TODO: write the bash script as well
+
 # Strong Password: At least 12 characters long but 14 or more is better.
 # A combination of uppercase letters, lowercase letters,
 # numbers, and symbols. Not a word that can be found in a dictionary
