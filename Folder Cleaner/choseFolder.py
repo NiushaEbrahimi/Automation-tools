@@ -58,6 +58,7 @@ class ChoseFolder:
         while True:
             try:
                 self._input()
+                print("\n this may take a few seconds")
                 all_paths = self._search_for_folder()
                 if all_paths:
                     os.system("cls")
@@ -72,7 +73,7 @@ class ChoseFolder:
                 try:
                     items = os.listdir(self.path)
                     # also => name = os.path.basename(self.path)
-                    print(f"\n{self.path.split("\\")[-1]} contains:")
+                    print(f"\n{self.path.split("\\")[-1]}:")
                     counter = 0
                     for item in items:
                         print(f"\t -{item}")
@@ -80,10 +81,11 @@ class ChoseFolder:
                         if counter ==5:
                             break
                         counter+=1
+                    print("\t...")
                 except PermissionError:
                     print(f"Cannot read contents of '{self.path.split("\\")[-1]}'")
             finally:
-                user_action = input("\nDo you want to try again ? (Y/n)")
+                user_action = input("\nDo you want to try again and chose another folder? (Y/n)")
                 if user_action.lower == "y" or user_action.lower == "yes" or user_action.lower == "":
                     continue
                 else:
