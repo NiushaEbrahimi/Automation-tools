@@ -4,10 +4,10 @@ import os
 # TODO: every time after this runs, tell the user what are the types of the remaining 
 #       files and ask what should be done to them
 
-object = ChoseFolder()
+chose_foler = ChoseFolder()
 
 class CleanFolder:
-    _PATH = object.main()
+    _PATH = chose_foler.main()
     def __init__(self):
         self.number_of_operations = {'Pictures' : 0 , 'Videos' : 0 , 'Music' : 0 , 'Documents' : 0}
         self.unknown_files = []
@@ -48,7 +48,7 @@ class CleanFolder:
         files = os.listdir()
         try:
             # Create destination folders inside user's home
-            # TODO: HAve to customize this
+            # TODO: Have to customize this
             base_dest = Path.home()
             folders = {
                 'Pictures': base_dest / "Pictures",
@@ -56,7 +56,6 @@ class CleanFolder:
                 'Music':    base_dest / "Music",
                 'Documents':base_dest / "Documents"
             }
-
             
             self.unknown_files = []
 
@@ -100,8 +99,6 @@ class CleanFolder:
                     print(f"{count} file(s) moved to {cat}\n")
                 else: print("no files were moved.")
             # TODO:show the unknown_files to the user
-            
-
 
     def final_step(self):
         process = True

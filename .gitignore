@@ -3,11 +3,11 @@
 
 # Ignore entire __pycache__ directories
 __pycache__/
-
-# Ignore other Python build artifacts
 *.pyo
 *.pyd
 .pycache
+*.py[cod]
+*$py.class
 
 # Ignore logs, envs, etc.
 __pycache__/
