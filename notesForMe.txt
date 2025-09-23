@@ -1,0 +1,9 @@
+on main line 30 : 
+
+        content = json.loads(self.content)
+
+loads ≈ parse (use it as an object/dict)
+dumps ≈ stringify (use it as an string)
+
+JSON.stringify(object) → turns a JS object into a JSON string
+JSON.parse(jsonString) → turns a JSON string back into a JS object
