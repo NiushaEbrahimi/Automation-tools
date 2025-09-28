@@ -1,9 +1,6 @@
 from choseFolder import ChoseFolder
 import os
 
-# TODO: every time after this runs, tell the user what are the types of the remaining 
-#       files and ask what should be done to them
-
 chose_foler = ChoseFolder()
 
 class CleanFolder:
@@ -29,48 +26,49 @@ class CleanFolder:
             ]
         }
 
-    # TODO: implement this 
     def _input_additional_fromat(self):
             os.system("cls")
             print(f"the default formats are : \n\n{self.format}")
-            while True:
-                try:
-                    user_result = int(input("Do you want to add formats to the categories that \nexist or you want to make a new one? (\n1:add to existing one\n2:make a new one\n)"))
-                    if user_result ==1:
-                        category_user=input("Enter the name of the category you want to add format to: ")
+            try:
+                user_result = int(input("Do you want to add formats to the categories that \nexist or you want to make a new one? (\n1:add to existing one\n2:make a new one\n)"))
+                if user_result ==1:
+                    category_user=input("Enter the name of the category you want to add format to: ")
 
-                        for category, extensions in self.format.items():
-                            if category_user == category:
-                                format_user = input("Enter the format you want to add to the category:use \",\" to seprate them" )
-                                format_user = format_user.split(",")
-                                for format in format_user:
-                                    if format.strip()[0] is not ".":
-                                        self.format[category_user].append("."+format)
-                                    else:
-                                        self.format[category_user].append(format.strip())
-                                print(self.format)
-                                return
+                    for category, extensions in self.format.items():
+                        if category_user == category:
+                            format_user = input("Enter the format you want to add to the category:use \",\" to seprate them" )
+                            format_user = format_user.split(",")
+                            for format in format_user:
+                                if format.strip()[0] is not ".":
+                                    self.format[category_user].append("."+format)
+                                else:
+                                    self.format[category_user].append(format.strip())
+                            input(self.format , "\n\nPress Enter to continue...")
+                            return
 
-                    elif user_result==2:
-                        name_of_category = input("Enter the name of the new category: ")
-                        format_user = input("Enter the format you want to add to the category:use \",\" to seprate them" )
-                        format_user = format_user.split(",")
-                        for format in format_user:
-                            if format.strip()[0] is not ".":
-                                self.format[name_of_category].append("."+format)
-                            else:
-                                self.format[name_of_category].append(format.strip())
-                        print(self.format)
-                        return
-                    else:
-                        raise Exception("Invalid Input")
-                    
-                except Exception as e:
-                    print(f"{e}")
+                elif user_result==2:
+                    name_of_category = input("Enter the name of the new category: ")
+                    format_user = input("Enter the format you want to add to the category:use \",\" to seprate them" )
+                    format_user = format_user.split(",")
+                    print("hello")
+                    for format in format_user:
+                        print("hello")
+                        if format.strip()[0] is not ".":
+                            print("hi")
+                            self.format[name_of_category].append("."+format)
+                        else:
+                            self.format[name_of_category].append(format.strip())
+                    input(self.format, "\n\nPress Enter to continue...")
+                    return
+                else:
+                    raise Exception("Invalid Input")
+                
+            except Exception as e:
+                print(f"{e}")
 
     def _move(self):
         from pathlib import Path
-
+        self.number_of_operations = {'Pictures' : 0 , 'Videos' : 0 , 'Music' : 0 , 'Documents' : 0}
         self._PATH = Path(self._PATH)
         try:
             # Create destination folders inside user's home
