@@ -31,21 +31,47 @@ class CleanFolder:
 
     # TODO: implement this 
     def _input_additional_fromat(self):
+            os.system("cls")
             print(f"the default formats are : \n\n{self.format}")
-            # TODO: get the formats in a list
-            try:
-                users_formats = input("Enter the formats you want (seprate them with space)")
-            # TODO: check if the user put them with "." in the first place
-            except Exception as e:
-                print(f"error is : {e}")
-            else:
-                self.format.append(lambda x: x in users_formats.split(" "))
+            while True:
+                try:
+                    user_result = int(input("Do you want to add formats to the categories that \nexist or you want to make a new one? (\n1:add to existing one\n2:make a new one\n)"))
+                    if user_result ==1:
+                        category_user=input("Enter the name of the category you want to add format to: ")
+
+                        for category, extensions in self.format.items():
+                            if category_user == category:
+                                format_user = input("Enter the format you want to add to the category:use \",\" to seprate them" )
+                                format_user = format_user.split(",")
+                                for format in format_user:
+                                    if format.strip()[0] is not ".":
+                                        self.format[category_user].append("."+format)
+                                    else:
+                                        self.format[category_user].append(format.strip())
+                                print(self.format)
+                                return
+
+                    elif user_result==2:
+                        name_of_category = input("Enter the name of the new category: ")
+                        format_user = input("Enter the format you want to add to the category:use \",\" to seprate them" )
+                        format_user = format_user.split(",")
+                        for format in format_user:
+                            if format.strip()[0] is not ".":
+                                self.format[name_of_category].append("."+format)
+                            else:
+                                self.format[name_of_category].append(format.strip())
+                        print(self.format)
+                        return
+                    else:
+                        raise Exception("Invalid Input")
+                    
+                except Exception as e:
+                    print(f"{e}")
 
     def _move(self):
         from pathlib import Path
 
         self._PATH = Path(self._PATH)
-        files = os.listdir()
         try:
             # Create destination folders inside user's home
             # TODO: Have to customize this
@@ -66,11 +92,17 @@ class CleanFolder:
 
             for item in self._PATH.iterdir():
                 if item.is_file():
+                    # this is the format
                     ext = item.suffix.lower()
-
                     if ext in ext_to_category:
                         category = ext_to_category[ext]
-                        dest_folder = folders[category]
+                        if category not in folders:
+                            #TODO: you can add them here or ask the user to input the path
+                            # for now add them into the existing folder
+                            dest_folder = self._PATH / category
+                            dest_folder.mkdir(exist_ok=True)
+                        else:
+                            dest_folder = folders[category]
                         dest_path = dest_folder / item.name
 
                         try:
@@ -96,9 +128,8 @@ class CleanFolder:
             print("\nOperation is done!\n")
             for cat, count in self.number_of_operations.items():
                 if count > 0:
-                    print(f"{count} file(s) moved to {cat}\n")
-                else: print("no files were moved.")
-            # TODO:show the unknown_files to the user
+                    print(f"{count} file(s) moved to {cat}")
+                else: print(f"no files were moved to {cat}.")
 
     def final_step(self):
         process = True
@@ -108,9 +139,24 @@ class CleanFolder:
                 response = input(f"Are you sure you want to clean {self._PATH} the folder in this address(Y/n)")
                 if response.strip().lower() in ('no' , 'n'):
                     print("breaking out ...")
+                    break
 
                 elif response.strip().lower() in ('y' , 'yes' , ''):
                     self._move()
+                    if self._PATH.iterdir() is not None:
+                        print("\nThe remaining files are: \n")
+                        for item in self._PATH.iterdir():
+                            print(item.name, end=", ")
+                        print("\n")
+                    clean_again= input("Do you want to clean the folder with your own formats? (Y/n)")
+                    if clean_again.strip().lower() in ('y' , 'yes' , ''):
+                        self._input_additional_fromat()
+                        self.final_step()
+                    elif clean_again.strip().lower() in ('no' , 'n'):
+                        process = False
+                        continue
+                    else:
+                        raise Exception("Invalid Input")
                     process = False
                     continue
 
@@ -124,3 +170,4 @@ class CleanFolder:
 clean_folder = CleanFolder()
 if __name__ == '__main__':
     clean_folder.final_step()
+    # clean_folder._input_additional_fromat()

@@ -2,8 +2,6 @@ import os
 from time import sleep
 from pathlib import Path
 
-# TODO: getting info that how many folders and where should the folders be
-# TODO: then search what type of files exist
 
 class ChoseFolder:
     def __init__(self):
@@ -16,19 +14,18 @@ class ChoseFolder:
         process = True
         while (process == True):
             try:
-                self.folder_name = input("Enter the name of the folder of your choice: (default: Downloads)")
+                self.folder_name = input("Enter the name of the folder of your choice:(We'll show all the possible options, also default is: Downloads)")
                 if self.folder_name == "" :
                     self.folder_name = 'Downloads' 
                 
-                # TODO: searche all accessible drives on any OS.
-                # TODO: Search only specific drives
+                # TODO: check if => accessible drives on any OS.
                 # TODO: Add progress feedback
                 # TODO: Make it faster with multithreading
 
                 process = False
 
             except ValueError:
-                print("It needs to be string don't enter anything else ;) ")
+                print("Invalid input, please try again ")
                 continue
 
             except Exception as e:
@@ -77,7 +74,7 @@ class ChoseFolder:
                     counter = 0
                     for item in items:
                         print(f"\t -{item}")
-                        # Don't need to show the whole folder to the user so that they figure
+                        #only show the first 5 
                         if counter ==5:
                             break
                         counter+=1
