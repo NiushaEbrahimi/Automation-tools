@@ -1,171 +1,190 @@
 from choseFolder import ChoseFolder
 import os
 
-chose_foler = ChoseFolder()
+chose_folder = ChoseFolder()
+
+def clear_screen():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 class CleanFolder:
-    _PATH = chose_foler.main()
+    _PATH = chose_folder.main()
+
     def __init__(self):
-        self.number_of_operations = {'Pictures' : 0 , 'Videos' : 0 , 'Music' : 0 , 'Documents' : 0}
+        self.number_of_operations = {'Pictures': 0, 'Videos': 0, 'Music': 0, 'Documents': 0}
         self.unknown_files = []
         self.format = {
-            'Pictures' : [
+            'Pictures': [
                 '.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.tif', '.webp', '.svg', '.ico',
                 '.raw', '.cr2', '.nef', '.arw', '.orf', '.sr2', '.dng', '.heic', '.heif'
             ],
-            'Videos' : [
+            'Videos': [
                 '.mp4', '.avi', '.mkv', '.mov', '.wmv', '.flv', '.webm', '.3gp', '.3g2',
                 '.mpeg', '.mpg', '.vob', '.ts', '.mts', '.m2ts', '.ogv'
             ],
-            'Music' : [
+            'Music': [
                 '.mp3', '.wav', '.aac', '.flac', '.ogg', '.wma', '.m4a', '.aiff', '.au', '.mid', '.midi', '.opus'
             ],
-            'Documents' : [
-                '.pdf', '.doc', '.docx', '.txt', '.rtf', '.odt', '.ppt', '.pptx', '.xls', '.xlsx', '.csv', 
+            'Documents': [
+                '.pdf', '.doc', '.docx', '.txt', '.rtf', '.odt', '.ppt', '.pptx', '.xls', '.xlsx', '.csv',
                 '.md', '.zip', '.rar', '.7z', '.tar', '.gz', '.iso'
             ]
         }
 
-    def _input_additional_fromat(self):
-            os.system("cls")
-            print(f"the default formats are : \n\n{self.format}")
-            try:
-                user_result = int(input("Do you want to add formats to the categories that \nexist or you want to make a new one? (\n1:add to existing one\n2:make a new one\n)"))
-                if user_result ==1:
-                    category_user=input("Enter the name of the category you want to add format to: ")
-
-                    for category, extensions in self.format.items():
-                        if category_user == category:
-                            format_user = input("Enter the format you want to add to the category:use \",\" to seprate them" )
-                            format_user = format_user.split(",")
-                            for format in format_user:
-                                if format.strip()[0] is not ".":
-                                    self.format[category_user].append("."+format)
-                                else:
-                                    self.format[category_user].append(format.strip())
-                            input(self.format , "\n\nPress Enter to continue...")
-                            return
-
-                elif user_result==2:
-                    name_of_category = input("Enter the name of the new category: ")
-                    format_user = input("Enter the format you want to add to the category:use \",\" to seprate them" )
-                    format_user = format_user.split(",")
-                    print("hello")
-                    for format in format_user:
-                        print("hello")
-                        if format.strip()[0] is not ".":
-                            print("hi")
-                            self.format[name_of_category].append("."+format)
-                        else:
-                            self.format[name_of_category].append(format.strip())
-                    input(self.format, "\n\nPress Enter to continue...")
+    def _input_additional_format(self):
+        clear_screen()
+        print(f"Current formats:\n{self.format}\n")
+        try:
+            user_result = int(input(
+                "Do you want to:\n"
+                "1: Add formats to existing category\n"
+                "2: Create a new category\n"
+                "Choose (1 or 2): "
+            ))
+            
+            if user_result == 1:
+                category_user = input("Enter category name: ").strip()
+                if category_user not in self.format:
+                    print("Category does not exist.")
+                    input("Press Enter...")
                     return
-                else:
-                    raise Exception("Invalid Input")
+
+                format_input = input("Enter formats separated by comma (e.g., .webm,.mkv): ")
+                formats = [f.strip() for f in format_input.split(",") if f.strip()]
+
+                for fmt in formats:
+                    if not fmt.startswith('.'):
+                        fmt = '.' + fmt
+                    if fmt not in self.format[category_user]:
+                        self.number_of_operations[category_user] = 0
+                        self.format[category_user].append(fmt)
                 
-            except Exception as e:
-                print(f"{e}")
+                print(f"Updated {category_user}: {self.format[category_user]}")
+                input("Press Enter to continue...")
+
+            elif user_result == 2:
+                name_of_category = input("Enter the name of the new category: ").strip()
+                if not name_of_category:
+                    print("Invalid name.")
+                    return
+
+                self.format[name_of_category] = [] 
+
+                format_input = input("Enter formats separated by comma: ")
+                formats = [f.strip() for f in format_input.split(",") if f.strip()]
+
+                for fmt in formats:
+                    if not fmt.startswith('.'):
+                        fmt = '.' + fmt
+                    self.format[name_of_category].append(fmt)
+
+                print(f"Created '{name_of_category}' with formats: {self.format[name_of_category]}")
+                input("Press Enter to continue...")
+
+            else:
+                print("Invalid choice.")
+                input("Press Enter...")
+
+        except ValueError:
+            print("Please enter a number.")
+            input("Press Enter...")
+        except Exception as e:
+            print(f"Error: {e}")
+            input("Press Enter...")
 
     def _move(self):
         from pathlib import Path
-        self.number_of_operations = {'Pictures' : 0 , 'Videos' : 0 , 'Music' : 0 , 'Documents' : 0}
-        self._PATH = Path(self._PATH)
-        try:
-            # Create destination folders inside user's home
-            # TODO: Have to customize this
-            base_dest = Path.home()
-            folders = {
-                'Pictures': base_dest / "Pictures",
-                'Videos':   base_dest / "Videos",
-                'Music':    base_dest / "Music",
-                'Documents':base_dest / "Documents"
-            }
-            
-            self.unknown_files = []
+        import shutil
 
-            ext_to_category = {}
-            for category, extensions in self.format.items():
-                for ext in extensions:
-                    ext_to_category[ext.lower()] = category
+        self.number_of_operations = {'Pictures': 0, 'Videos': 0, 'Music': 0, 'Documents': 0}
+        path = Path(self._PATH)
+        
+        base_dest = Path.home()
+        folders = {
+            'Pictures': base_dest / "Pictures",
+            'Videos':   base_dest / "Videos",
+            'Music':    base_dest / "Music",
+            'Documents':base_dest / "Documents"
+        }
 
-            for item in self._PATH.iterdir():
-                if item.is_file():
-                    # this is the format
-                    ext = item.suffix.lower()
-                    if ext in ext_to_category:
-                        category = ext_to_category[ext]
-                        if category not in folders:
-                            #TODO: you can add them here or ask the user to input the path
-                            # for now add them into the existing folder
-                            dest_folder = self._PATH / category
-                            dest_folder.mkdir(exist_ok=True)
-                        else:
-                            dest_folder = folders[category]
-                        dest_path = dest_folder / item.name
+        for folder in folders.values():
+            folder.mkdir(exist_ok=True)
 
-                        try:
-                            # shutil.move for robust cross-device support
-                            import shutil
-                            shutil.move(str(item), str(dest_path))
-                            self.number_of_operations[category] += 1
-                            print(f"Moved '{item.name}' => {category}")
+        ext_to_category = {}
+        for category, extensions in self.format.items():
+            for ext in extensions:
+                ext_to_category[ext.lower()] = category
 
-                        except PermissionError:
-                            print("Don't have the permission to move this file.")
+        for item in path.iterdir():
+            if item.is_file():
+                ext = item.suffix.lower()
+                if ext in ext_to_category:
+                    category = ext_to_category[ext]
+                    dest_folder = folders.get(category, path / category)
+                    print(f"Debug: Moving '{item.name}' to category '{category}' -> folder: '{dest_folder}'")
 
-                        except Exception as error:
-                            print(f"Failed to move {item.name}: because of {error}")
+                    if not dest_folder.exists():
+                        dest_folder.mkdir(exist_ok=True)
 
-                    else:
-                        self.unknown_files.append(item.name)
+                    dest_path = dest_folder / item.name
+                    print(f"Debug: Full destination path: '{dest_path}'")
 
-        except Exception as e:
-            print(f"error is: {e}")
+                    try:
+                        shutil.move(str(item), str(dest_path))
+                        self.number_of_operations[category] += 1
+                        print(f"Moved '{item.name}' => {category}")
+                    except PermissionError:
+                        print(f"Permission denied: {item.name}")
+                    except Exception as e:
+                        print(f"Failed to move '{item.name}': [{type(e).__name__}] {e}")
+                        print(f"Source: {item}")
+                        print(f"Dest F: {dest_folder}")
+                        print(f"Dest P: {dest_path}")
+                else:
+                    self.unknown_files.append(item.name)
 
-        finally:
-            print("\nOperation is done!\n")
-            for cat, count in self.number_of_operations.items():
-                if count > 0:
-                    print(f"{count} file(s) moved to {cat}")
-                else: print(f"no files were moved to {cat}.")
+        print("\nOperation completed!")
+        for cat, count in self.number_of_operations.items():
+            print(f"{count} file(s) moved to {cat}")
+
 
     def final_step(self):
-        process = True
-        while (process == True):
-            try: 
-                os.system("cls")
-                response = input(f"Are you sure you want to clean {self._PATH} the folder in this address(Y/n)")
-                if response.strip().lower() in ('no' , 'n'):
-                    print("breaking out ...")
+        from pathlib import Path
+        while True:
+            try:
+                clear_screen()
+                response = input(f"Clean folder: {self._PATH}? (Y/n): ").strip().lower()
+                if response in ('n', 'no'):
+                    print("Cancelled.")
                     break
 
-                elif response.strip().lower() in ('y' , 'yes' , ''):
+                elif response in ('y', 'yes', ''):
                     self._move()
-                    if self._PATH.iterdir() is not None:
-                        print("\nThe remaining files are: \n")
-                        for item in self._PATH.iterdir():
-                            print(item.name, end=", ")
-                        print("\n")
-                    clean_again= input("Do you want to clean the folder with your own formats? (Y/n)")
-                    if clean_again.strip().lower() in ('y' , 'yes' , ''):
-                        self._input_additional_fromat()
-                        self.final_step()
-                    elif clean_again.strip().lower() in ('no' , 'n'):
-                        process = False
+
+                    remaining = [item.name for item in Path(self._PATH).iterdir() if item.is_file()]
+                    if remaining:
+                        print("\nUnknown files left:")
+                        print(", ".join(remaining))
+                        print()
+
+                    again = input("Add custom formats and clean again? (Y/n): ").strip().lower()
+                    if again in ('y', 'yes'):
+                        self._input_additional_format()
                         continue
                     else:
-                        raise Exception("Invalid Input")
-                    process = False
-                    continue
+                        print("Goodbye!")
+                        break
 
-                else: 
-                    raise KeyboardInterrupt
-                
-            except KeyboardInterrupt :
-                print("Invalid Input ... ")
-                continue
+                else:
+                    print("Please enter 'y' or 'n'.")
 
-clean_folder = CleanFolder()
+            except KeyboardInterrupt:
+                print("\n\nCancelled by user.")
+                break
+
+            except Exception as e:
+                print(f"Unexpected error: {e}")
+                break
+
 if __name__ == '__main__':
+    clean_folder = CleanFolder()
     clean_folder.final_step()
-    # clean_folder._input_additional_fromat()
